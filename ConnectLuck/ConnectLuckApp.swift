@@ -11,7 +11,7 @@ import SwiftUI
 struct ConnectLuckApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            FoodTruckListView()
         }
     }
 }
