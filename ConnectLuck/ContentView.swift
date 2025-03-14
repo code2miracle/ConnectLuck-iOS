@@ -2,20 +2,20 @@
 //  ContentView.swift
 //  ConnectLuck
 //
-//  Created by 이종민 on 3/13/25.
+//  Created by 이종민 on 3/14/25.
 //
 
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject private var userState: UserState
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        if userState.isLoggedIn {
+            MainTabView()
+        } else {
+            LoginView()
         }
-        .padding()
     }
 }
 
