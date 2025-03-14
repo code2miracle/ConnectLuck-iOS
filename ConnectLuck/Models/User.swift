@@ -18,6 +18,11 @@ struct User: Codable, Identifiable, Equatable {
     var profileImage: String?
     var reviews: [Review]?
     
+    enum CodingKeys: String, CodingKey {
+        case id = "userId"
+        case email, name, phone, roles, createdAt, updatedAt, profileImage, reviews
+    }
+    
     // Equatable 구현
     static func == (lhs: User, rhs: User) -> Bool {
         return lhs.id == rhs.id

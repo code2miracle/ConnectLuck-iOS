@@ -16,16 +16,12 @@ struct HomeView: View {
     private let recentFoodTrucks = FoodTruck.dummyData().prefix(5)
     
     // 추천 행사 더미 데이터
-    private let recommendedEvents = [
-        Event(id: 1, name: "부산 푸드 페스티벌", description: "부산 최대 규모의 푸드 페스티벌", location: "부산 해운대", startDate: "2025-04-15", endDate: "2025-04-20", imageUrl: "https://picsum.photos/id/292/800/600", organizerName: "부산시청"),
-        Event(id: 2, name: "서울 야시장", description: "서울 밤을 밝히는 맛있는 야시장", location: "서울 여의도", startDate: "2025-05-01", endDate: "2025-05-03", imageUrl: "https://picsum.photos/id/431/800/600", organizerName: "서울시청"),
-        Event(id: 3, name: "대학 축제", description: "대학 봄 축제", location: "서울대학교", startDate: "2025-05-10", endDate: "2025-05-12", imageUrl: "https://picsum.photos/id/1080/800/600", organizerName: "서울대학교 총학생회")
-    ]
+    private let recommendedEvents = Event.dummyData()
     
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 24) { // 섹션 간 간격 24pt
                     // 검색 바
                     searchBar
                     
@@ -49,6 +45,7 @@ struct HomeView: View {
                 }
                 .padding(.bottom, 16)
             }
+            .background(CLColor.SwiftUI.backgroundBase) // 배경색 적용
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
@@ -63,7 +60,7 @@ struct HomeView: View {
                         showingNotifications.toggle()
                     } label: {
                         Image(systemName: "bell")
-                            .foregroundColor(Color(hex: "#212121"))
+                            .foregroundColor(CLColor.SwiftUI.textPrimary)
                     }
                 }
             }
@@ -76,28 +73,9 @@ struct HomeView: View {
     // MARK: - 컴포넌트
     
     private var searchBar: some View {
-        HStack {
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(Color(hex: "#757575"))
-                
-                TextField("푸드트럭 또는 행사 검색", text: $searchText)
-                    .font(.system(size: 16))
-                
-                if !searchText.isEmpty {
-                    Button {
-                        searchText = ""
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(Color(hex: "#757575"))
-                    }
-                }
-            }
-            .padding(12)
-            .background(Color(hex: "#F5F5F5"))
-            .cornerRadius(10)
-        }
-        .padding(.horizontal, 16)
+        SearchBar(text: $searchText, placeholder: "푸드트럭 또는 행사 검색")
+            .padding(.horizontal, 16) // 화면 가장자리 여백 16pt
+            .padding(.top, 8)
     }
     
     private var welcomeSection: some View {
@@ -105,29 +83,29 @@ struct HomeView: View {
             if let user = userState.currentUser {
                 Text("안녕하세요, \(user.name)님")
                     .font(.system(size: 24, weight: .medium))
-                    .foregroundColor(Color(hex: "#212121"))
+                    .foregroundColor(CLColor.SwiftUI.textPrimary)
                 
                 if userState.isEventManager {
                     Text("당신의 행사에 맞는 푸드트럭을 찾아보세요")
                         .font(.system(size: 16))
-                        .foregroundColor(Color(hex: "#757575"))
+                        .foregroundColor(CLColor.SwiftUI.textSecondary)
                 } else if userState.isFoodTruckManager {
                     Text("참여 가능한 행사를 확인해보세요")
                         .font(.system(size: 16))
-                        .foregroundColor(Color(hex: "#757575"))
+                        .foregroundColor(CLColor.SwiftUI.textSecondary)
                 } else {
                     Text("오늘은 어떤 맛있는 음식을 찾고 계신가요?")
                         .font(.system(size: 16))
-                        .foregroundColor(Color(hex: "#757575"))
+                        .foregroundColor(CLColor.SwiftUI.textSecondary)
                 }
             } else {
                 Text("Connect Luck에 오신 것을 환영합니다")
                     .font(.system(size: 24, weight: .medium))
-                    .foregroundColor(Color(hex: "#212121"))
+                    .foregroundColor(CLColor.SwiftUI.textPrimary)
                 
                 Text("로그인하고 더 많은 기능을 이용해보세요")
                     .font(.system(size: 16))
-                    .foregroundColor(Color(hex: "#757575"))
+                    .foregroundColor(CLColor.SwiftUI.textSecondary)
             }
         }
         .padding(.horizontal, 16)
@@ -135,7 +113,7 @@ struct HomeView: View {
     }
     
     private var activeFoodTrucksSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 12) { // 요소 간 간격 12pt
             SectionHeader(title: "지금 영업 중인 푸드트럭", actionText: "더보기")
             
             ScrollView(.horizontal, showsIndicators: false) {
@@ -155,7 +133,7 @@ struct HomeView: View {
             
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 16) {
-                    ForEach(recommendedEvents, id: \.id) { event in
+                    ForEach(recommendedEvents) { event in
                         EventCard(event: event)
                     }
                 }
@@ -182,7 +160,7 @@ struct HomeView: View {
             SectionHeader(title: "참여 가능한 행사", actionText: "더보기")
             
             VStack(spacing: 12) {
-                ForEach(recommendedEvents, id: \.id) { event in
+                ForEach(recommendedEvents) { event in
                     RecommendedEventRow(event: event)
                 }
             }
@@ -206,6 +184,196 @@ struct HomeView: View {
 
 // MARK: - 보조 뷰 컴포넌트
 
+// SearchBar, SectionHeader, ActiveFoodTruckCard, FoodTypeTag, StatusBadge, InfoRow 같은 컴포넌트는 변경 없음
+
+struct EventCard: View {
+    let event: Event
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            // 이미지
+            ZStack(alignment: .topTrailing) {
+                AsyncImage(url: URL(string: event.imageUrl)) { phase in
+                    switch phase {
+                    case .empty:
+                        Rectangle()
+                            .fill(CLColor.SwiftUI.surface)
+                            .aspectRatio(16/9, contentMode: .fill)
+                            .frame(width: 280, height: 140)
+                            .cornerRadius(8)
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 280, height: 140)
+                            .cornerRadius(8)
+                            .clipped()
+                    case .failure:
+                        Rectangle()
+                            .fill(CLColor.SwiftUI.surface)
+                            .aspectRatio(16/9, contentMode: .fill)
+                            .frame(width: 280, height: 140)
+                            .cornerRadius(8)
+                            .overlay(
+                                Image(systemName: "photo")
+                                    .foregroundColor(CLColor.SwiftUI.textSecondary)
+                            )
+                    @unknown default:
+                        Rectangle()
+                            .fill(CLColor.SwiftUI.surface)
+                            .aspectRatio(16/9, contentMode: .fill)
+                            .frame(width: 280, height: 140)
+                            .cornerRadius(8)
+                    }
+                }
+                
+                // 이벤트 상태 배지
+                StatusBadge(status: event.status)
+                    .padding([.top, .trailing], 12)
+            }
+            
+            // 정보
+            VStack(alignment: .leading, spacing: 4) {
+                Text(event.title)
+                    .font(.system(size: 20, weight: .semibold)) // Title3 스타일
+                    .foregroundColor(CLColor.SwiftUI.textPrimary)
+                    .lineLimit(1)
+                
+                InfoRow(icon: "mappin.and.ellipse", text: event.address)
+                
+                InfoRow(icon: "calendar", text: event.dateRange)
+            }
+            .padding(.horizontal, 12)
+            .padding(.bottom, 12)
+        }
+        .frame(width: 280)
+        .background(CLColor.SwiftUI.backgroundBase)
+        .cornerRadius(12) // 큰 카드 코너 반경 12pt
+        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+    }
+}
+
+struct RecommendedEventRow: View {
+    let event: Event
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            // 이미지
+            AsyncImage(url: URL(string: event.imageUrl)) { phase in
+                switch phase {
+                case .empty:
+                    Rectangle()
+                        .fill(CLColor.SwiftUI.surface)
+                        .frame(width: 60, height: 60)
+                        .cornerRadius(8)
+                case .success(let image):
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 60, height: 60)
+                        .cornerRadius(8)
+                        .clipped()
+                case .failure:
+                    Rectangle()
+                        .fill(CLColor.SwiftUI.surface)
+                        .frame(width: 60, height: 60)
+                        .cornerRadius(8)
+                        .overlay(
+                            Image(systemName: "photo")
+                                .foregroundColor(CLColor.SwiftUI.textSecondary)
+                        )
+                @unknown default:
+                    Rectangle()
+                        .fill(CLColor.SwiftUI.surface)
+                        .frame(width: 60, height: 60)
+                        .cornerRadius(8)
+                }
+            }
+            
+            // 정보
+            VStack(alignment: .leading, spacing: 4) {
+                Text(event.title)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(CLColor.SwiftUI.textPrimary)
+                
+                HStack(spacing: 8) {
+                    Image(systemName: "mappin.and.ellipse")
+                        .font(.system(size: 12))
+                        .foregroundColor(CLColor.SwiftUI.textSecondary)
+                    
+                    Text(event.streetAddress)
+                        .font(.system(size: 14))
+                        .foregroundColor(CLColor.SwiftUI.textSecondary)
+                        .lineLimit(1)
+                    
+                    // String+Extension 사용하여 날짜 포맷팅
+                    if let formattedDate = event.startAt.toFormattedDate() {
+                        Text(formattedDate)
+                            .font(.system(size: 14))
+                            .foregroundColor(CLColor.SwiftUI.textSecondary)
+                    }
+                }
+            }
+            
+            Spacer()
+            
+            // 화살표 아이콘
+            Image(systemName: "chevron.right")
+                .foregroundColor(CLColor.SwiftUI.textSecondary)
+        }
+        .padding(16)
+        .background(CLColor.SwiftUI.backgroundBase)
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+    }
+}
+
+struct NotificationsView: View {
+    var body: some View {
+        NavigationView {
+            VStack {
+                Text("알림이 없습니다")
+                    .font(.system(size: 16))
+                    .foregroundColor(CLColor.SwiftUI.textSecondary)
+                    .padding()
+            }
+            .background(CLColor.SwiftUI.backgroundBase)
+            .navigationTitle("알림")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+// MARK: - 보조 뷰 컴포넌트
+
+struct SearchBar: View {
+    @Binding var text: String
+    var placeholder: String
+
+    var body: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(CLColor.SwiftUI.textSecondary)
+
+            TextField(placeholder, text: $text)
+                .font(.system(size: 17))
+                .foregroundColor(CLColor.SwiftUI.textPrimary)
+
+            if !text.isEmpty {
+                Button(action: {
+                    text = ""
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(CLColor.SwiftUI.textSecondary)
+                }
+            }
+        }
+        .padding(.horizontal, 12)
+        .frame(height: 40)
+        .background(CLColor.SwiftUI.surface)
+        .cornerRadius(8) // 중간 카드 코너 반경 8pt
+    }
+}
+
 struct SectionHeader: View {
     let title: String
     let actionText: String
@@ -213,8 +381,8 @@ struct SectionHeader: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(.system(size: 20, weight: .medium))
-                .foregroundColor(Color(hex: "#212121"))
+                .font(.system(size: 22, weight: .bold)) // Title2 스타일
+                .foregroundColor(CLColor.SwiftUI.textPrimary)
             
             Spacer()
             
@@ -222,8 +390,8 @@ struct SectionHeader: View {
                 // 더보기 액션
             }) {
                 Text(actionText)
-                    .font(.system(size: 14))
-                    .foregroundColor(Color(hex: "#0066CC"))
+                    .font(.system(size: 15)) // Subheadline 스타일
+                    .foregroundColor(CLColor.SwiftUI.primaryColor)
             }
         }
         .padding(.horizontal, 16)
@@ -240,143 +408,99 @@ struct ActiveFoodTruckCard: View {
                 switch phase {
                 case .empty:
                     Rectangle()
-                        .fill(Color(hex: "#E0E0E0"))
+                        .fill(CLColor.SwiftUI.surface)
                         .aspectRatio(16/9, contentMode: .fill)
                         .frame(width: 160, height: 100)
-                        .cornerRadius(12)
+                        .cornerRadius(8)
                 case .success(let image):
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 160, height: 100)
-                        .cornerRadius(12)
+                        .cornerRadius(8)
                         .clipped()
                 case .failure:
                     Rectangle()
-                        .fill(Color(hex: "#E0E0E0"))
+                        .fill(CLColor.SwiftUI.surface)
                         .aspectRatio(16/9, contentMode: .fill)
                         .frame(width: 160, height: 100)
-                        .cornerRadius(12)
+                        .cornerRadius(8)
                         .overlay(
                             Image(systemName: "photo")
-                                .foregroundColor(Color(hex: "#9E9E9E"))
+                                .foregroundColor(CLColor.SwiftUI.textSecondary)
                         )
                 @unknown default:
                     Rectangle()
-                        .fill(Color(hex: "#E0E0E0"))
+                        .fill(CLColor.SwiftUI.surface)
                         .aspectRatio(16/9, contentMode: .fill)
                         .frame(width: 160, height: 100)
-                        .cornerRadius(12)
+                        .cornerRadius(8)
                 }
             }
             
             // 정보
             VStack(alignment: .leading, spacing: 4) {
                 Text(truck.name)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(Color(hex: "#212121"))
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(CLColor.SwiftUI.textPrimary)
                     .lineLimit(1)
                 
                 if let foodTypeEnum = truck.foodTypeEnum {
-                    Text(foodTypeEnum.displayName)
-                        .font(.system(size: 14))
-                        .foregroundColor(Color(hex: "#757575"))
+                    FoodTypeTag(type: foodTypeEnum.displayName)
                 }
                 
                 HStack(spacing: 4) {
                     Image(systemName: "star.fill")
                         .font(.system(size: 12))
-                        .foregroundColor(Color(hex: "#F7C948")) // 별점 컬러
+                        .foregroundColor(CLColor.SwiftUI.accentColor)
                     
                     Text(String(format: "%.1f", truck.avgRating))
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(Color(hex: "#212121"))
+                        .foregroundColor(CLColor.SwiftUI.textPrimary)
                     
                     Text("(\(truck.reviewCount))")
                         .font(.system(size: 12))
-                        .foregroundColor(Color(hex: "#9E9E9E"))
+                        .foregroundColor(CLColor.SwiftUI.textSecondary)
                 }
             }
         }
         .frame(width: 160)
+        .padding(.bottom, 8)
+        .background(CLColor.SwiftUI.backgroundBase)
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
     }
 }
 
-struct EventCard: View {
-    let event: Event
-    
+struct FoodTypeTag: View {
+    var type: String
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // 이미지
-            AsyncImage(url: URL(string: event.imageUrl)) { phase in
-                switch phase {
-                case .empty:
-                    Rectangle()
-                        .fill(Color(hex: "#E0E0E0"))
-                        .aspectRatio(16/9, contentMode: .fill)
-                        .frame(width: 280, height: 140)
-                        .cornerRadius(12)
-                case .success(let image):
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 280, height: 140)
-                        .cornerRadius(12)
-                        .clipped()
-                case .failure:
-                    Rectangle()
-                        .fill(Color(hex: "#E0E0E0"))
-                        .aspectRatio(16/9, contentMode: .fill)
-                        .frame(width: 280, height: 140)
-                        .cornerRadius(12)
-                        .overlay(
-                            Image(systemName: "photo")
-                                .foregroundColor(Color(hex: "#9E9E9E"))
-                        )
-                @unknown default:
-                    Rectangle()
-                        .fill(Color(hex: "#E0E0E0"))
-                        .aspectRatio(16/9, contentMode: .fill)
-                        .frame(width: 280, height: 140)
-                        .cornerRadius(12)
-                }
-            }
-            
-            // 정보
-            VStack(alignment: .leading, spacing: 4) {
-                Text(event.name)
-                    .font(.system(size: 18, weight: .medium))
-                    .foregroundColor(Color(hex: "#212121"))
-                    .lineLimit(1)
-                
-                Text(event.location)
-                    .font(.system(size: 14))
-                    .foregroundColor(Color(hex: "#757575"))
-                
-                HStack(spacing: 4) {
-                    Image(systemName: "calendar")
-                        .font(.system(size: 12))
-                        .foregroundColor(Color(hex: "#757575"))
-                    
-                    Text("\(formatDate(event.startDate)) - \(formatDate(event.endDate))")
-                        .font(.system(size: 14))
-                        .foregroundColor(Color(hex: "#757575"))
-                }
-            }
-            .padding(.horizontal, 4)
-        }
-        .frame(width: 280)
+        Text(type)
+            .font(.system(size: 13)) // Footnote 스타일
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(CLColor.SwiftUI.primaryColor.opacity(0.1))
+            .foregroundColor(CLColor.SwiftUI.primaryColor)
+            .cornerRadius(4) // 작은 요소 코너 반경 4pt
     }
-    
-    // 날짜 포맷 함수
-    private func formatDate(_ dateString: String) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        if let date = formatter.date(from: dateString) {
-            formatter.dateFormat = "MM/dd"
-            return formatter.string(from: date)
+}
+
+struct InfoRow: View {
+    var icon: String
+    var text: String
+        
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 14))
+                .foregroundColor(CLColor.SwiftUI.textSecondary)
+            
+            Text(text)
+                .font(.system(size: 15)) // Subheadline 스타일
+                .foregroundColor(CLColor.SwiftUI.textSecondary)
+                .lineLimit(1)
         }
-        return dateString
     }
 }
 
@@ -390,7 +514,7 @@ struct RecommendedFoodTruckRow: View {
                 switch phase {
                 case .empty:
                     Rectangle()
-                        .fill(Color(hex: "#E0E0E0"))
+                        .fill(CLColor.SwiftUI.surface)
                         .frame(width: 60, height: 60)
                         .cornerRadius(8)
                 case .success(let image):
@@ -402,16 +526,16 @@ struct RecommendedFoodTruckRow: View {
                         .clipped()
                 case .failure:
                     Rectangle()
-                        .fill(Color(hex: "#E0E0E0"))
+                        .fill(CLColor.SwiftUI.surface)
                         .frame(width: 60, height: 60)
                         .cornerRadius(8)
                         .overlay(
                             Image(systemName: "photo")
-                                .foregroundColor(Color(hex: "#9E9E9E"))
+                                .foregroundColor(CLColor.SwiftUI.textSecondary)
                         )
                 @unknown default:
                     Rectangle()
-                        .fill(Color(hex: "#E0E0E0"))
+                        .fill(CLColor.SwiftUI.surface)
                         .frame(width: 60, height: 60)
                         .cornerRadius(8)
                 }
@@ -421,23 +545,23 @@ struct RecommendedFoodTruckRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(truck.name)
                     .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(Color(hex: "#212121"))
+                    .foregroundColor(CLColor.SwiftUI.textPrimary)
                 
                 HStack(spacing: 8) {
                     if let foodTypeEnum = truck.foodTypeEnum {
                         Text(foodTypeEnum.displayName)
                             .font(.system(size: 14))
-                            .foregroundColor(Color(hex: "#757575"))
+                            .foregroundColor(CLColor.SwiftUI.textSecondary)
                     }
                     
                     HStack(spacing: 2) {
                         Image(systemName: "star.fill")
                             .font(.system(size: 12))
-                            .foregroundColor(Color(hex: "#F7C948"))
+                            .foregroundColor(CLColor.SwiftUI.accentColor)
                         
                         Text(String(format: "%.1f", truck.avgRating))
                             .font(.system(size: 14))
-                            .foregroundColor(Color(hex: "#212121"))
+                            .foregroundColor(CLColor.SwiftUI.textPrimary)
                     }
                 }
             }
@@ -446,135 +570,12 @@ struct RecommendedFoodTruckRow: View {
             
             // 화살표 아이콘
             Image(systemName: "chevron.right")
-                .foregroundColor(Color(hex: "#9E9E9E"))
+                .foregroundColor(CLColor.SwiftUI.textSecondary)
         }
-        .padding(12)
-        .background(Color.white)
+        .padding(16) // 컴포넌트 내부 여백 16pt
+        .background(CLColor.SwiftUI.backgroundBase)
         .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color(hex: "#E0E0E0"), lineWidth: 1)
-        )
-    }
-}
-
-struct RecommendedEventRow: View {
-    let event: Event
-    
-    var body: some View {
-        HStack(spacing: 12) {
-            // 이미지
-            AsyncImage(url: URL(string: event.imageUrl)) { phase in
-                switch phase {
-                case .empty:
-                    Rectangle()
-                        .fill(Color(hex: "#E0E0E0"))
-                        .frame(width: 60, height: 60)
-                        .cornerRadius(8)
-                case .success(let image):
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 60, height: 60)
-                        .cornerRadius(8)
-                        .clipped()
-                case .failure:
-                    Rectangle()
-                        .fill(Color(hex: "#E0E0E0"))
-                        .frame(width: 60, height: 60)
-                        .cornerRadius(8)
-                        .overlay(
-                            Image(systemName: "photo")
-                                .foregroundColor(Color(hex: "#9E9E9E"))
-                        )
-                @unknown default:
-                    Rectangle()
-                        .fill(Color(hex: "#E0E0E0"))
-                        .frame(width: 60, height: 60)
-                        .cornerRadius(8)
-                }
-            }
-            
-            // 정보
-            VStack(alignment: .leading, spacing: 4) {
-                Text(event.name)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(Color(hex: "#212121"))
-                
-                HStack(spacing: 8) {
-                    Image(systemName: "mappin.and.ellipse")
-                        .font(.system(size: 12))
-                        .foregroundColor(Color(hex: "#757575"))
-                    
-                    Text(event.location)
-                        .font(.system(size: 14))
-                        .foregroundColor(Color(hex: "#757575"))
-                        .lineLimit(1)
-                    
-                    Text(formatDate(event.startDate))
-                        .font(.system(size: 14))
-                        .foregroundColor(Color(hex: "#757575"))
-                }
-            }
-            
-            Spacer()
-            
-            // 화살표 아이콘
-            Image(systemName: "chevron.right")
-                .foregroundColor(Color(hex: "#9E9E9E"))
-        }
-        .padding(12)
-        .background(Color.white)
-        .cornerRadius(12)
-        .overlay(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(Color(hex: "#E0E0E0"), lineWidth: 1)
-        )
-    }
-    
-    // 날짜 포맷 함수
-    private func formatDate(_ dateString: String) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        if let date = formatter.date(from: dateString) {
-            formatter.dateFormat = "MM/dd"
-            return formatter.string(from: date)
-        }
-        return dateString
-    }
-}
-
-struct NotificationsView: View {
-    var body: some View {
-        NavigationView {
-            VStack {
-                Text("알림이 없습니다")
-                    .font(.system(size: 16))
-                    .foregroundColor(Color(hex: "#757575"))
-                    .padding()
-            }
-            .navigationTitle("알림")
-            .navigationBarTitleDisplayMode(.inline)
-        }
-    }
-}
-
-// 이벤트 모델
-struct Event: Identifiable {
-    let id: Int
-    let name: String
-    let description: String
-    let location: String
-    let startDate: String
-    let endDate: String
-    let imageUrl: String
-    let organizerName: String
-}
-
-struct HomeView_Previews: PreviewProvider {
-    static var previews: some View {
-        HomeView()
-            .environmentObject(UserState())
+        .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
     }
 }
 
