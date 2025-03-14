@@ -12,6 +12,7 @@ struct FoodTruckDetailView: View {
     @State private var detailViewModel = FoodTruckDetailViewModel()
     @State private var selectedTab = 0
     @State private var showReviewForm = false
+    @EnvironmentObject private var userState: UserState
     
     var body: some View {
         ScrollView {
@@ -69,6 +70,23 @@ struct FoodTruckDetailView: View {
                 message: Text(detailViewModel.errorMessage ?? "오류가 발생했습니다."),
                 dismissButton: .default(Text("확인"))
             )
+        }
+        .sheet(isPresented: $showReviewForm) {
+            // 리뷰 작성 폼 - 추후 구현
+            VStack {
+                Text("리뷰 작성 폼")
+                    .font(.title)
+                    .padding()
+                
+                Text("이 기능은 2단계 개발에서 구현 예정입니다.")
+                    .foregroundColor(.secondary)
+                    .padding()
+                
+                Button("닫기") {
+                    showReviewForm = false
+                }
+                .padding()
+            }
         }
     }
     
@@ -166,14 +184,16 @@ struct FoodTruckDetailView: View {
                     .foregroundColor(CLColor.SwiftUI.textPrimary)
                     .padding(.top, 4)
                 
-                // 현재 영업 중 배지
+                // 운영 관련 정보 - 현재는 더미 데이터
                 HStack {
+                    // 현재 영업 중이라고 가정
                     StatusBadge(status: .recruiting, text: "현재 영업 중")
                     
                     Spacer()
                     
+                    // 위치 보기 버튼 - 3단계에서 구현 예정
                     Button {
-                        // 나중에 지도로 위치 보기 기능 추가
+                        // 지도 기능은 3단계에서 구현
                     } label: {
                         Label("위치 보기", systemImage: "map")
                             .font(.system(size: 14))
@@ -181,6 +201,26 @@ struct FoodTruckDetailView: View {
                     }
                 }
                 .padding(.top, 8)
+                
+                // 푸드트럭 관리자인 경우 추가 버튼 표시
+                if userState.isFoodTruckManager && userState.currentUser?.name == foodTruck.managerName {
+                    HStack {
+                        Spacer()
+                        
+                        Button {
+                            // 영업 시작 기능은 3단계에서 구현
+                        } label: {
+                            Text("영업 시작")
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                                .background(CLColor.SwiftUI.primaryColor)
+                                .cornerRadius(8)
+                        }
+                    }
+                    .padding(.top, 12)
+                }
             } else {
                 // 로딩 중인 경우의 스켈레톤 UI
                 Rectangle()
@@ -299,6 +339,22 @@ struct FoodTruckDetailView: View {
     private var reviewContent: some View {
         VStack(alignment: .leading, spacing: 16) {
             if let foodTruck = detailViewModel.foodTruckDetail {
+                // 리뷰 작성 버튼
+                if userState.isLoggedIn {
+                    Button {
+                        showReviewForm = true
+                    } label: {
+                        Text("리뷰 작성하기")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(CLColor.SwiftUI.primaryColor)
+                            .cornerRadius(8)
+                    }
+                    .padding(.bottom, 8)
+                }
+                
                 if foodTruck.reviews.isEmpty {
                     VStack(spacing: 16) {
                         Image(systemName: "square.and.pencil")
@@ -310,18 +366,31 @@ struct FoodTruckDetailView: View {
                             .font(.system(size: 16))
                             .foregroundColor(CLColor.SwiftUI.textSecondary)
                         
-                        Button {
-                            showReviewForm = true
-                        } label: {
-                            Text("첫 리뷰 작성하기")
-                                .font(.system(size: 16, weight: .semibold))
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 12)
-                                .background(CLColor.SwiftUI.primaryColor)
-                                .cornerRadius(8)
+                        if userState.isLoggedIn {
+                            Button {
+                                showReviewForm = true
+                            } label: {
+                                Text("첫 리뷰 작성하기")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 12)
+                                    .background(CLColor.SwiftUI.primaryColor)
+                                    .cornerRadius(8)
+                            }
+                            .padding(.top, 8)
+                        } else {
+                            NavigationLink(destination: LoginView()) {
+                                Text("로그인하고 리뷰 작성하기")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 12)
+                                    .background(CLColor.SwiftUI.primaryColor)
+                                    .cornerRadius(8)
+                            }
+                            .padding(.top, 8)
                         }
-                        .padding(.top, 8)
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 40)
@@ -553,27 +622,11 @@ struct ReviewRow: View {
     }
 }
 
-// 상태 배지 컴포넌트 (텍스트 커스터마이징 가능)
-struct StatusBadge: View {
-    var status: EventStatus
-    var text: String? = nil
-    
-    var body: some View {
-        Text(text ?? status.displayText)
-            .font(.system(size: 13, weight: .medium))
-            .foregroundColor(.white)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 4)
-            .background(status.color)
-            .cornerRadius(12)
-    }
-}
-
-// 상세 화면 ViewModel
-
-
 struct FoodTruckDetailView_Previews: PreviewProvider {
     static var previews: some View {
-        FoodTruckDetailView(foodTruckId: 1)
+        NavigationView {
+            FoodTruckDetailView(foodTruckId: 1)
+                .environmentObject(UserState())
+        }
     }
 }
