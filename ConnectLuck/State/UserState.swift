@@ -28,7 +28,7 @@ class UserState {
     private func loadUserInfo() {
         Task {
             do {
-                let user = try await AuthService.shared.getUserInfo()
+                let user = try await UserService.shared.getUserInfo()
                 await MainActor.run {
                     self.currentUser = user
                 }
@@ -57,7 +57,7 @@ class UserState {
     // 사용자 정보 새로 가져오기
     func fetchUserInfo() async {
         do {
-            let user = try await AuthService.shared.getUserInfo()
+            let user = try await UserService.shared.getUserInfo()
             await MainActor.run {
                 self.currentUser = user
             }

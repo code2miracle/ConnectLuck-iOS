@@ -7,8 +7,8 @@
 
 import Foundation
 
-class AuthService {
-    static let shared = AuthService()
+class UserService {
+    static let shared = UserService()
     
     /// 로그인 API 호출
     func login(email: String, password: String) async throws -> String {

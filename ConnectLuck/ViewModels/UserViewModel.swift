@@ -37,7 +37,7 @@ class UserViewModel {
 
         do {
             print("로그인 API 호출 시작")
-            let token = try await AuthService.shared.login(email: email, password: password)
+            let token = try await UserService.shared.login(email: email, password: password)
             print("로그인 API 응답 성공: 토큰 받음")
 
             TokenManager.shared.saveToken(token)
@@ -72,7 +72,7 @@ class UserViewModel {
         
         do {
             print("회원가입 API 호출 시작")
-            let tokenResponse = try await AuthService.shared.signup(email: email, password: password, name: name, phoneNumber: phoneNumber)
+            let tokenResponse = try await UserService.shared.signup(email: email, password: password, name: name, phoneNumber: phoneNumber)
             print("회원가입 API 응답 성공: 토큰 받음")
             
             TokenManager.shared.saveToken(tokenResponse.token)
@@ -111,7 +111,7 @@ class UserViewModel {
         
         isLoading = true
         do {
-            currentUser = try await AuthService.shared.getUserInfo()
+            currentUser = try await UserService.shared.getUserInfo()
             isLoading = false
         } catch {
             errorMessage = "사용자 정보를 불러오는데 실패했습니다: \(error.localizedDescription)"
@@ -150,7 +150,7 @@ class UserViewModel {
         isLoading = true
         
         do {
-            currentUser = try await AuthService.shared.addRole(role: role)
+            currentUser = try await UserService.shared.addRole(role: role)
             isLoading = false
             return true
         } catch {
