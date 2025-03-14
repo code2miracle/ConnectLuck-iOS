@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    @EnvironmentObject private var userState: UserState
+    @State var userState: UserState
     @State private var searchText = ""
     @State private var showingNotifications = false
     
@@ -580,5 +580,5 @@ struct RecommendedFoodTruckRow: View {
 }
 
 #Preview {
-    HomeView()
+    HomeView(userState: UserState())
 }

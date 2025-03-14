@@ -9,13 +9,12 @@ import SwiftUI
 
 @main
 struct ConnectLuckApp: App {
-    @StateObject private var userState = UserState()
+    @State private var userState = UserState()
     
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                ContentView()
-                    .environmentObject(userState)
+                ContentView(userState: userState)
             }
             .task {
                 // 앱 시작 시 서버 연결 테스트

@@ -3,12 +3,13 @@
 //  ConnectLuck
 //
 //  Created by 이종민 on 3/14/25.
+//  Updated for iOS 17 features
 //
 
 import SwiftUI
 
 struct ProfileView: View {
-    @EnvironmentObject private var userState: UserState
+    @State var userState: UserState
     @State private var showRoleSelectionSheet = false
     
     var body: some View {
@@ -166,7 +167,7 @@ struct ProfileView: View {
                 .listStyle(InsetGroupedListStyle())
                 .navigationTitle("마이페이지")
                 .sheet(isPresented: $showRoleSelectionSheet) {
-                    RoleSelectionView()
+                    RoleSelectionView(userState: userState)
                 }
             } else {
                 // 로그인 안 된 상태
@@ -201,25 +202,10 @@ struct ProfileView: View {
     }
 }
 
-// 역할 배지 컴포넌트
-struct RoleBadge: View {
-    let text: String
-    
-    var body: some View {
-        Text(text)
-            .font(.system(size: 12, weight: .medium))
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(CLColor.SwiftUI.primaryColor.opacity(0.1))
-            .foregroundColor(CLColor.SwiftUI.primaryColor)
-            .cornerRadius(12)
-    }
-}
-
 // 역할 선택 뷰
 struct RoleSelectionView: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject private var userState: UserState
+    @State var userState: UserState
     @State private var selectedRole: UserRole?
     @State private var isLoading = false
     @State private var errorMessage: String?
@@ -332,6 +318,21 @@ struct RoleSelectionView: View {
     }
 }
 
+// 역할 배지 컴포넌트
+struct RoleBadge: View {
+    let text: String
+    
+    var body: some View {
+        Text(text)
+            .font(.system(size: 12, weight: .medium))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(CLColor.SwiftUI.primaryColor.opacity(0.1))
+            .foregroundColor(CLColor.SwiftUI.primaryColor)
+            .cornerRadius(12)
+    }
+}
+
 // 역할 카드 컴포넌트
 struct RoleCard: View {
     let icon: String
@@ -378,9 +379,6 @@ struct RoleCard: View {
     }
 }
 
-struct ProfileView_Previews: PreviewProvider {
-    static var previews: some View {
-        ProfileView()
-            .environmentObject(UserState())
-    }
+#Preview {
+    ProfileView(userState: UserState())
 }

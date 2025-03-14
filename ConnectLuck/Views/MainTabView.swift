@@ -8,22 +8,22 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @EnvironmentObject private var userState: UserState
+    @State var userState: UserState
     @State private var selectedTab = 0
     
     var body: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $selectedTab) {
-                HomeView()
+                HomeView(userState: userState)
                     .tag(0)
                 
-                FoodTruckListView()
+                FoodTruckListView(userState: userState)
                     .tag(1)
                 
                 EventListView()
                     .tag(2)
                 
-                ProfileView()
+                ProfileView(userState: userState)
                     .tag(3)
             }
             
@@ -84,103 +84,6 @@ struct TabItem {
     let icon: String
 }
 
-// 임시 뷰들 (실제 구현 전 플레이스홀더)
-struct MapPlaceholderView: View {
-    var body: some View {
-        Text("지도 뷰")
-            .font(.title)
-            .foregroundColor(CLColor.SwiftUI.textPrimary)
-    }
-}
-
-struct EventListPlaceholderView: View {
-    var body: some View {
-        Text("행사 목록")
-            .font(.title)
-            .foregroundColor(CLColor.SwiftUI.textPrimary)
-    }
-}
-
-struct ProfilePlaceholderView: View {
-    var body: some View {
-        Text("프로필")
-            .font(.title)
-            .foregroundColor(CLColor.SwiftUI.textPrimary)
-    }
-}
-
-struct MainTabView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainTabView()
-            .environmentObject(UserState())
-    }
-}
-
-class UserState: ObservableObject {
-    @Published var currentUser: User?
-    @Published var isLoggedIn = false
-    
-    init() {
-        // 저장된 토큰으로 로그인 상태 체크
-        isLoggedIn = TokenManager.shared.isLoggedIn
-        
-        // 로그인 상태면 사용자 정보 로드
-        if isLoggedIn {
-            loadUserInfo()
-        }
-    }
-    
-    // 사용자 정보 로드
-    private func loadUserInfo() {
-        Task {
-            do {
-                let user = try await AuthService.shared.getUserInfo()
-                DispatchQueue.main.async {
-                    self.currentUser = user
-                }
-            } catch {
-                print("사용자 정보 로드 실패: \(error)")
-                // 토큰이 유효하지 않은 경우 로그아웃 처리
-                DispatchQueue.main.async {
-                    self.logout()
-                }
-            }
-        }
-    }
-    
-    // 로그아웃
-    func logout() {
-        TokenManager.shared.clearToken()
-        currentUser = nil
-        isLoggedIn = false
-    }
-    
-    // 권한 체크 메서드
-    var isAdmin: Bool { currentUser?.isAdmin() ?? false }
-    var isEventManager: Bool { currentUser?.isEventManager() ?? false }
-    var isFoodTruckManager: Bool { currentUser?.isFoodTruckManager() ?? false }
-}
-
-extension UserState {
-    // 사용자 정보 새로 가져오기
-    func fetchUserInfo() async {
-        do {
-            let user = try await AuthService.shared.getUserInfo()
-            DispatchQueue.main.async {
-                self.currentUser = user
-            }
-        } catch {
-            print("사용자 정보 업데이트 실패: \(error)")
-            // 토큰이 유효하지 않은 경우 로그아웃 처리
-            if let urlError = error as? URLError, urlError.code == .userAuthenticationRequired {
-                DispatchQueue.main.async {
-                    self.logout()
-                }
-            }
-        }
-    }
-}
-
 #Preview {
-    MainTabView()
+    MainTabView(userState: UserState())
 }

@@ -8,17 +8,17 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject private var userState: UserState
+    @State var userState: UserState
     
     var body: some View {
         if userState.isLoggedIn {
-            MainTabView()
+            MainTabView(userState: userState)
         } else {
-            LoginView()
+            LoginView(userState: userState)
         }
     }
 }
 
 #Preview {
-    ContentView()
+    ContentView(userState: UserState())
 }

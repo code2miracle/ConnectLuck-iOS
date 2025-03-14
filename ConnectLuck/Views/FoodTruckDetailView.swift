@@ -12,7 +12,7 @@ struct FoodTruckDetailView: View {
     @State private var detailViewModel = FoodTruckDetailViewModel()
     @State private var selectedTab = 0
     @State private var showReviewForm = false
-    @EnvironmentObject private var userState: UserState
+    @State var userState: UserState
     
     var body: some View {
         ScrollView {
@@ -380,7 +380,7 @@ struct FoodTruckDetailView: View {
                             }
                             .padding(.top, 8)
                         } else {
-                            NavigationLink(destination: LoginView()) {
+                            NavigationLink(destination: LoginView(userState: userState)) {
                                 Text("로그인하고 리뷰 작성하기")
                                     .font(.system(size: 16, weight: .semibold))
                                     .foregroundColor(.white)
@@ -622,11 +622,9 @@ struct ReviewRow: View {
     }
 }
 
-struct FoodTruckDetailView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            FoodTruckDetailView(foodTruckId: 1)
-                .environmentObject(UserState())
-        }
+#Preview {
+    NavigationView {
+        FoodTruckDetailView(foodTruckId: 1, userState: UserState())
     }
 }
+

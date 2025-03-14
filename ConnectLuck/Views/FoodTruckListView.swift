@@ -13,6 +13,7 @@ struct FoodTruckListView: View {
     @State private var selectedFoodType: FoodType?
     @State private var isFilterSheetPresented = false
     @State private var isSearching = false
+    @State var userState: UserState
     
     var body: some View {
         NavigationView {
@@ -166,7 +167,7 @@ struct FoodTruckListView: View {
                     emptyStateView
                 } else {
                     ForEach(viewModel.foodTrucks, id: \.id) { truck in
-                        NavigationLink(destination: FoodTruckDetailView(foodTruckId: truck.id)) {
+                        NavigationLink(destination: FoodTruckDetailView(foodTruckId: truck.id, userState: userState)) {
                             FoodTruckCard(truck: truck)
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -530,6 +531,6 @@ struct TextButton: View {
 // MARK: - 미리보기
 struct FoodTruckListView_Previews: PreviewProvider {
     static var previews: some View {
-        FoodTruckListView()
+        FoodTruckListView(userState: UserState())
     }
 }

@@ -14,26 +14,30 @@ struct LoginView: View {
     @State private var showSignup = false
     @State private var showForgotPassword = false
     @State private var isLoading = false
-    @EnvironmentObject private var userState: UserState
+    @State var userState: UserState
     
     var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 24) {
                     // 로고
-                    Image("ConnectLuckLogo") // 로고 이미지 필요
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 60)
-                        .padding(.top, 40)
+                    VStack(spacing: 12) {
+                        Image(systemName: "hands.sparkles.fill")
+                            .font(.system(size: 60))
+                            .foregroundColor(CLColor.SwiftUI.primaryColor)
+                            .padding(.top, 40)
+                        
+                        Text("Connect Luck")
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundColor(CLColor.SwiftUI.textPrimary)
+                        
+                        Text("푸드트럭과 행사를 연결하는 플랫폼")
+                            .font(.system(size: 16))
+                            .foregroundColor(CLColor.SwiftUI.textSecondary)
+                            .padding(.top, 4)
+                    }
                     
                     // 환영 텍스트
-                    Text("Connect Luck에 오신 것을 환영합니다")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(CLColor.SwiftUI.textPrimary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal)
-                    
                     Text("로그인하고 서비스를 이용해보세요")
                         .font(.system(size: 16))
                         .foregroundColor(CLColor.SwiftUI.textSecondary)
@@ -104,17 +108,41 @@ struct LoginView: View {
                         }
                         .padding(.top, 8)
                     }
-                    .padding(.horizontal, 24)
                     .padding(.top, 16)
                     
-                    Spacer()
+                    // 소셜 로그인 - 추후 구현 예정
+                    VStack(spacing: 16) {
+                        Text("또는")
+                            .font(.system(size: 14))
+                            .foregroundColor(CLColor.SwiftUI.textSecondary)
+                            .padding(.vertical, 8)
+                        
+                        socialLoginButtons
+                    }
+                    .padding(.top, 24)
+                    
+                    // 게스트로 둘러보기
+                    Button {
+                        // 메인 화면으로 이동 (로그인 없이)
+                        // 2단계에서 구현 예정
+                    } label: {
+                        Text("게스트로 둘러보기")
+                            .font(.system(size: 16))
+                            .foregroundColor(CLColor.SwiftUI.textSecondary)
+                            .padding(.vertical, 12)
+                    }
+                    .padding(.top, 24)
                 }
+                .padding(.horizontal, 24)
                 .padding(.bottom, 40)
             }
             .background(CLColor.SwiftUI.backgroundBase)
             .navigationBarHidden(true)
             .fullScreenCover(isPresented: $showSignup) {
-                SignUpView()
+                SignUpView(userState: userState)
+            }
+            .sheet(isPresented: $showForgotPassword) {
+                FindAccountView()
             }
             .overlay {
                 if isLoading {
@@ -136,6 +164,63 @@ struct LoginView: View {
         }
     }
     
+    // 소셜 로그인 버튼들
+    private var socialLoginButtons: some View {
+        VStack(spacing: 12) {
+            Button {
+                // 카카오 로그인 기능 - 추후 구현
+            } label: {
+                HStack {
+                    Image(systemName: "message.fill")
+                        .foregroundColor(.black)
+                    
+                    Text("카카오로 시작하기")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.black)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(Color.yellow)
+                .cornerRadius(8)
+            }
+            
+            Button {
+                // 네이버 로그인 기능 - 추후 구현
+            } label: {
+                HStack {
+                    Image(systemName: "n.square.fill")
+                        .foregroundColor(.white)
+                    
+                    Text("네이버로 시작하기")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.white)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(Color.green)
+                .cornerRadius(8)
+            }
+            
+            Button {
+                // 구글 로그인 기능 - 추후 구현
+            } label: {
+                HStack {
+                    Image(systemName: "g.circle.fill")
+                        .foregroundColor(.white)
+                    
+                    Text("Google로 시작하기")
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundColor(.white)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(Color.red)
+                .cornerRadius(8)
+            }
+        }
+    }
+    
+    // 로그인 기능
     private func login() {
         isLoading = true
         
@@ -143,14 +228,40 @@ struct LoginView: View {
             let success = await viewModel.login(email: email, password: password)
             if success {
                 userState.isLoggedIn = true
+                userState.currentUser = viewModel.currentUser
             }
             isLoading = false
         }
     }
 }
 
-struct LoginView_Previews: PreviewProvider {
-    static var previews: some View {
-        LoginView()
+// 임시 계정 찾기 화면 (추후 구현 예정)
+struct FindAccountView: View {
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            VStack {
+                Text("계정 찾기")
+                    .font(.title)
+                    .padding()
+                
+                Text("이 기능은 2단계에서 구현 예정입니다.")
+                    .foregroundColor(.secondary)
+            }
+            .navigationTitle("계정 찾기")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("닫기") {
+                        dismiss()
+                    }
+                }
+            }
+        }
     }
+}
+
+#Preview {
+    LoginView(userState: UserState())
 }

@@ -3,6 +3,7 @@
 //  ConnectLuck
 //
 //  Created by 이종민 on 3/14/25.
+//  Updated for iOS 17 features
 //
 
 import SwiftUI
@@ -10,6 +11,7 @@ import SwiftUI
 struct SignUpView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel = UserViewModel()
+    @State var userState: UserState
     
     // 회원가입 입력 필드
     @State private var email = ""
@@ -49,7 +51,7 @@ struct SignUpView: View {
                                     .cornerRadius(8)
                                     .keyboardType(.emailAddress)
                                     .autocapitalization(.none)
-                                    .onChange(of: email) { _, _ in
+                                    .onChange(of: email) {
                                         isEmailChecked = false
                                         validateEmail()
                                     }
@@ -95,7 +97,7 @@ struct SignUpView: View {
                                 .padding(16)
                                 .background(CLColor.SwiftUI.surface)
                                 .cornerRadius(8)
-                                .onChange(of: password) { _, _ in
+                                .onChange(of: password) {
                                     validatePassword()
                                     validatePasswordMatch()
                                 }
@@ -119,7 +121,7 @@ struct SignUpView: View {
                                 .padding(16)
                                 .background(CLColor.SwiftUI.surface)
                                 .cornerRadius(8)
-                                .onChange(of: confirmPassword) { _, _ in
+                                .onChange(of: confirmPassword) {
                                     validatePasswordMatch()
                                 }
                             
@@ -148,7 +150,7 @@ struct SignUpView: View {
                                 .padding(16)
                                 .background(CLColor.SwiftUI.surface)
                                 .cornerRadius(8)
-                                .onChange(of: name) { _, _ in
+                                .onChange(of: name) {
                                     isNameValid = !name.isEmpty
                                 }
                         }
@@ -165,7 +167,7 @@ struct SignUpView: View {
                                 .background(CLColor.SwiftUI.surface)
                                 .cornerRadius(8)
                                 .keyboardType(.numberPad)
-                                .onChange(of: phoneNumber) { _, _ in
+                                .onChange(of: phoneNumber) {
                                     validatePhone()
                                 }
                             
@@ -291,6 +293,9 @@ struct SignUpView: View {
         
         Task {
             if await viewModel.signup(email: email, password: password, name: name, phoneNumber: phoneNumber) {
+                // 성공 시 UserState 업데이트
+                userState.isLoggedIn = true
+                userState.currentUser = viewModel.currentUser
                 isLoading = false
                 dismiss() // 성공 시 로그인 화면으로 돌아가기
             } else {
@@ -300,8 +305,6 @@ struct SignUpView: View {
     }
 }
 
-struct SignUpView_Previews: PreviewProvider {
-    static var previews: some View {
-        SignUpView()
-    }
+#Preview {
+    SignUpView(userState: UserState())
 }
