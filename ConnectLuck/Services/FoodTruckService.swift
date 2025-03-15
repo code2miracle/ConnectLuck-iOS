@@ -21,7 +21,7 @@ class FoodTruckService {
         if let foodType = foodType {
             queryItems.append(URLQueryItem(name: "foodType", value: foodType.rawValue))
         }
-
+        
         var endpoint = EndPoint.FoodTruck.list
         if !queryItems.isEmpty {
             let queryString = queryItems.map { "\($0.name)=\($0.value!)" }.joined(separator: "&")
@@ -36,6 +36,10 @@ class FoodTruckService {
     func fetchFoodTruckDetail(id: Int) async throws -> FoodTruckDetail {
         let endpoint = EndPoint.FoodTruck.detail(id)
         print("API 요청: \(EndPoint.baseURL)\(endpoint)")
-        return try await NetworkManager.shared.request(endpoint: endpoint)
+        
+        let response: FoodTruckDetail = try await NetworkManager.shared.request(endpoint: endpoint)
+        
+        print("푸드트럭 상세 정보: \(response)")
+        return response
     }
 }

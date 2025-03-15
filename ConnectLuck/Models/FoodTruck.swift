@@ -22,16 +22,3 @@ struct FoodTruck: Codable, Identifiable {
         return FoodType(rawValue: foodType)
     }
 }
-
-// 기존 구조체는 FoodTruckDetail로 이름 변경하여 사용 가능
-struct FoodTruckDetail: Codable, Identifiable {
-    let id: Int
-    let name: String
-    let description: String
-    let imageUrl: String
-    let managerName: String
-    let foodType: FoodType
-    let reviews: [Review]
-    let menus: [MenuItem]
-    let avgRating: Double
-}
