@@ -11,7 +11,7 @@ import SwiftUI
 struct SignUpView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel = UserViewModel()
-    @State var userState: UserState
+    @Environment(UserState.self) var userState: UserState
     
     // 회원가입 입력 필드
     @State private var email = ""
@@ -306,5 +306,5 @@ struct SignUpView: View {
 }
 
 #Preview {
-    SignUpView(userState: UserState())
+    SignUpView()
 }

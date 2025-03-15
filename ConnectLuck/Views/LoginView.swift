@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct LoginView: View {
+    @Environment(UserState.self) var userState: UserState
     @State private var viewModel = UserViewModel()
     @State private var email = ""
     @State private var password = ""
     @State private var showSignup = false
     @State private var showForgotPassword = false
     @State private var isLoading = false
-    @State var userState: UserState
+    
     
     var body: some View {
         NavigationView {
@@ -139,7 +140,7 @@ struct LoginView: View {
             .background(CLColor.SwiftUI.backgroundBase)
             .navigationBarHidden(true)
             .fullScreenCover(isPresented: $showSignup) {
-                SignUpView(userState: userState)
+                SignUpView()
             }
             .sheet(isPresented: $showForgotPassword) {
                 FindAccountView()
@@ -263,5 +264,5 @@ struct FindAccountView: View {
 }
 
 #Preview {
-    LoginView(userState: UserState())
+    LoginView()
 }

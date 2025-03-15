@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct HomeView: View {
-    @State var userState: UserState
     @State private var searchText = ""
     @State private var showingNotifications = false
+    @Environment(UserState.self) var userState
     
     // 최근 푸드트럭 더미 데이터
     private let recentFoodTrucks = FoodTruck.dummyData().prefix(5)
@@ -480,7 +480,7 @@ struct FoodTypeTag: View {
             .font(.system(size: 13)) // Footnote 스타일
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background(CLColor.SwiftUI.primaryColor.opacity(0.1))
+            .background(CLColor.SwiftUI.primaryColor.opacity(0.2))
             .foregroundColor(CLColor.SwiftUI.primaryColor)
             .cornerRadius(4) // 작은 요소 코너 반경 4pt
     }
@@ -580,5 +580,5 @@ struct RecommendedFoodTruckRow: View {
 }
 
 #Preview {
-    HomeView(userState: UserState())
+    HomeView()
 }

@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @State var userState: UserState
+    @Environment(UserState.self) var userState: UserState
     @State private var showRoleSelectionSheet = false
     
     var body: some View {
@@ -304,7 +304,7 @@ struct RoleSelectionView: View {
                 let userViewModel = UserViewModel()
                 if await userViewModel.addRole(role: role) {
                     // 성공 시 UserState 업데이트
-                    await userState.fetchUserInfo()
+                    userState.loadUserInfo()
                     isLoading = false
                     dismiss()
                 } else {
@@ -380,5 +380,5 @@ struct RoleCard: View {
 }
 
 #Preview {
-    ProfileView(userState: UserState())
+    ProfileView()
 }

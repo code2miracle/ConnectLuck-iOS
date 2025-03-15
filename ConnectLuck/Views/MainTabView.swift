@@ -8,22 +8,22 @@
 import SwiftUI
 
 struct MainTabView: View {
-    @State var userState: UserState
     @State private var selectedTab = 0
+    @Environment(UserState.self) var userState : UserState
     
     var body: some View {
         ZStack(alignment: .bottom) {
             TabView(selection: $selectedTab) {
-                HomeView(userState: userState)
+                HomeView()
                     .tag(0)
                 
-                FoodTruckListView(userState: userState)
+                FoodTruckListView()
                     .tag(1)
                 
                 EventListView()
                     .tag(2)
                 
-                ProfileView(userState: userState)
+                ProfileView()
                     .tag(3)
             }
             
@@ -43,5 +43,5 @@ struct MainTabView: View {
 
 
 #Preview {
-    MainTabView(userState: UserState())
+    MainTabView()
 }
