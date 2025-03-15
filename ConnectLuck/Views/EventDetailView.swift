@@ -232,53 +232,53 @@ import SwiftUI
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundColor(CLColor.SwiftUI.textPrimary)
             
-            if let event = detailViewModel.eventDetail, let manager = event.manager {
-                VStack(alignment: .leading, spacing: 12) {
-                    // 주최자 이름
-                    if let name = manager["name"] as? String {
-                        HStack(spacing: 12) {
-                            Image(systemName: "person.fill")
-                                .font(.system(size: 16))
-                                .foregroundColor(CLColor.SwiftUI.primaryColor)
-                                .frame(width: 24)
-                            
-                            Text(name)
-                                .font(.system(size: 16))
-                                .foregroundColor(CLColor.SwiftUI.textPrimary)
-                        }
-                    }
-                    
-                    // 주최자 연락처
-                    if let phone = manager["phone"] as? String {
-                        HStack(spacing: 12) {
-                            Image(systemName: "phone.fill")
-                                .font(.system(size: 16))
-                                .foregroundColor(CLColor.SwiftUI.primaryColor)
-                                .frame(width: 24)
-                            
-                            Text(phone)
-                                .font(.system(size: 16))
-                                .foregroundColor(CLColor.SwiftUI.textPrimary)
-                        }
-                    }
-                }
-            } else {
-                // 로딩 중인 경우의 스켈레톤 UI
-                ForEach(0..<2, id: \.self) { _ in
-                    HStack(spacing: 12) {
-                        Rectangle()
-                            .fill(CLColor.SwiftUI.surface)
-                            .frame(width: 24, height: 24)
-                            .cornerRadius(4)
-                        
-                        Rectangle()
-                            .fill(CLColor.SwiftUI.surface)
-                            .frame(height: 16)
-                            .cornerRadius(4)
-                    }
-                    .padding(.vertical, 4)
-                }
-            }
+//            if let event = detailViewModel.eventDetail, let manager = event.managerName {
+//                VStack(alignment: .leading, spacing: 12) {
+//                    // 주최자 이름
+//                    if let name = manager["name"] as? String {
+//                        HStack(spacing: 12) {
+//                            Image(systemName: "person.fill")
+//                                .font(.system(size: 16))
+//                                .foregroundColor(CLColor.SwiftUI.primaryColor)
+//                                .frame(width: 24)
+//                            
+//                            Text(name)
+//                                .font(.system(size: 16))
+//                                .foregroundColor(CLColor.SwiftUI.textPrimary)
+//                        }
+//                    }
+//                    
+//                    // 주최자 연락처
+//                    if let phone = manager["phone"] as? String {
+//                        HStack(spacing: 12) {
+//                            Image(systemName: "phone.fill")
+//                                .font(.system(size: 16))
+//                                .foregroundColor(CLColor.SwiftUI.primaryColor)
+//                                .frame(width: 24)
+//                            
+//                            Text(phone)
+//                                .font(.system(size: 16))
+//                                .foregroundColor(CLColor.SwiftUI.textPrimary)
+//                        }
+//                    }
+//                }
+//            } else {
+//                // 로딩 중인 경우의 스켈레톤 UI
+//                ForEach(0..<2, id: \.self) { _ in
+//                    HStack(spacing: 12) {
+//                        Rectangle()
+//                            .fill(CLColor.SwiftUI.surface)
+//                            .frame(width: 24, height: 24)
+//                            .cornerRadius(4)
+//                        
+//                        Rectangle()
+//                            .fill(CLColor.SwiftUI.surface)
+//                            .frame(height: 16)
+//                            .cornerRadius(4)
+//                    }
+//                    .padding(.vertical, 4)
+//                }
+//            }
         }
         .padding(.vertical, 8)
     }
@@ -287,7 +287,7 @@ import SwiftUI
     private var applicationButton: some View {
         VStack {
             if let event = detailViewModel.eventDetail {
-                if event.status == .recruiting || event.status == .comingSoon {
+                if event.status == .applicationFinished || event.status == .beforeApplication {
                     PrimaryButton(text: "푸드트럭 참가 신청하기") {
                         showApplicationForm = true
                     }

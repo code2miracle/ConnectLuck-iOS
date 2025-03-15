@@ -13,7 +13,7 @@ struct FoodTruckListView: View {
     @State private var selectedFoodType: FoodType?
     @State private var isFilterSheetPresented = false
     @State private var isSearching = false
-    @State var userState: UserState
+    @Environment(UserState.self) var userState
     
     var body: some View {
         NavigationView {
@@ -95,7 +95,7 @@ struct FoodTruckListView: View {
                     .foregroundColor(CLColor.SwiftUI.textSecondary)
                 
                 TextField("푸드트럭 이름 검색", text: $searchName)
-                    .font(.system(size: 17)) // Body 스타일
+                    .font(.system(size: 16)) // 디자인 가이드의 본문 사이즈
                     .foregroundColor(CLColor.SwiftUI.textPrimary)
                     .onSubmit {
                         isSearching = true
@@ -133,7 +133,7 @@ struct FoodTruckListView: View {
             if selectedFoodType != nil {
                 HStack {
                     Text("필터:")
-                        .font(.system(size: 13)) // Footnote 스타일
+                        .font(.system(size: 12)) // 디자인 가이드의 캡션 스타일
                         .foregroundColor(CLColor.SwiftUI.textSecondary)
                     
                     if let type = selectedFoodType {
@@ -167,7 +167,7 @@ struct FoodTruckListView: View {
                     emptyStateView
                 } else {
                     ForEach(viewModel.foodTrucks, id: \.id) { truck in
-                        NavigationLink(destination: FoodTruckDetailView(foodTruckId: truck.id, userState: userState)) {
+                        NavigationLink(destination: FoodTruckDetailView(foodTruckId: truck.id)) {
                             FoodTruckCard(truck: truck)
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -193,11 +193,11 @@ struct FoodTruckListView: View {
                 .foregroundColor(CLColor.SwiftUI.textSecondary)
             
             Text("검색 결과가 없습니다")
-                .font(.system(size: 20, weight: .semibold)) // Title3 스타일
+                .font(.system(size: 20, weight: .semibold)) // 헤드라인3 스타일
                 .foregroundColor(CLColor.SwiftUI.textPrimary)
             
             Text("다른 검색어나 필터를 사용해보세요")
-                .font(.system(size: 15)) // Subheadline 스타일
+                .font(.system(size: 14)) // 본문 작게 스타일
                 .foregroundColor(CLColor.SwiftUI.textSecondary)
                 .multilineTextAlignment(.center)
             
@@ -225,9 +225,13 @@ struct FoodTruckListView: View {
                     .scaleEffect(1.5)
                 
                 Text("로딩 중...")
-                    .font(.system(size: 17, weight: .medium)) // Body 스타일
+                    .font(.system(size: 16, weight: .medium)) // 본문 스타일
                     .foregroundColor(CLColor.SwiftUI.textSecondary)
             }
+            .padding(24)
+            .background(CLColor.SwiftUI.backgroundBase)
+            .cornerRadius(12)
+            .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
         }
         .ignoresSafeArea()
     }
@@ -258,7 +262,7 @@ struct FoodTruckCard: View {
                             .fill(CLColor.SwiftUI.surface)
                             .aspectRatio(16/9, contentMode: .fill)
                             .frame(height: 180)
-                            .cornerRadius(8)
+                            .cornerRadius(12)
                             .overlay {
                                 ProgressView()
                             }
@@ -267,17 +271,17 @@ struct FoodTruckCard: View {
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(height: 180)
-                            .cornerRadius(8)
+                            .cornerRadius(12)
                             .clipped()
                     case .failure:
                         Rectangle()
                             .fill(CLColor.SwiftUI.surface)
                             .aspectRatio(16/9, contentMode: .fill)
                             .frame(height: 180)
-                            .cornerRadius(8)
+                            .cornerRadius(12)
                             .overlay {
                                 Image(systemName: "photo")
-                                    .font(.largeTitle)
+                                    .font(.system(size: 24))
                                     .foregroundColor(CLColor.SwiftUI.textSecondary)
                             }
                     @unknown default:
@@ -285,7 +289,7 @@ struct FoodTruckCard: View {
                             .fill(CLColor.SwiftUI.surface)
                             .aspectRatio(16/9, contentMode: .fill)
                             .frame(height: 180)
-                            .cornerRadius(8)
+                            .cornerRadius(12)
                     }
                 }
                 
@@ -300,7 +304,7 @@ struct FoodTruckCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
                     Text(truck.name)
-                        .font(.system(size: 20, weight: .semibold)) // Title3 스타일
+                        .font(.system(size: 18, weight: .semibold)) // 서브헤드 스타일
                         .foregroundColor(CLColor.SwiftUI.textPrimary)
                         .lineLimit(1)
                     
@@ -312,36 +316,35 @@ struct FoodTruckCard: View {
                             .foregroundColor(CLColor.SwiftUI.accentColor)
                         
                         Text(String(format: "%.1f", truck.avgRating))
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(CLColor.SwiftUI.textPrimary)
                         
                         Text("(\(truck.reviewCount))")
-                            .font(.system(size: 13))
+                            .font(.system(size: 12))
                             .foregroundColor(CLColor.SwiftUI.textSecondary)
                     }
                 }
                 
                 Text(truck.description)
-                    .font(.system(size: 15)) // Subheadline 스타일
+                    .font(.system(size: 14)) // 본문 작게 스타일
                     .foregroundColor(CLColor.SwiftUI.textSecondary)
                     .lineLimit(2)
                 
                 HStack {
                     Text("운영자: \(truck.managerName)")
-                        .font(.system(size: 13)) // Footnote 스타일
+                        .font(.system(size: 12)) // 캡션 스타일
                         .foregroundColor(CLColor.SwiftUI.textSecondary)
                         .lineLimit(1)
                     
                     Spacer()
                     
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 13))
-                        .foregroundColor(CLColor.SwiftUI.textSecondary)
+                    // 현재 영업 상태 표시 (예: "영업중", "모집중" 등)
+                    StatusBadge(status: FoodTruckStatus.recruiting)
                 }
                 .padding(.top, 4)
             }
             .padding(.horizontal, 16)
-            .padding(.bottom, 16)
+            .padding(.vertical, 12)
         }
         .background(CLColor.SwiftUI.backgroundBase)
         .cornerRadius(12) // 큰 카드 코너 반경 12pt
@@ -356,13 +359,13 @@ struct FilterChip: View {
     var body: some View {
         HStack(spacing: 4) {
             Text(label)
-                .font(.system(size: 13)) // Footnote 스타일
+                .font(.system(size: 12)) // 캡션 스타일
                 .padding(.leading, 8)
                 .padding(.vertical, 4)
             
             Button(action: onRemove) {
                 Image(systemName: "xmark")
-                    .font(.system(size: 12))
+                    .font(.system(size: 10))
                     .padding(4)
             }
         }
@@ -414,7 +417,7 @@ struct FilterSheetView: View {
                             }
                         } header: {
                             Text(groupTitles[index])
-                                .font(.system(size: 20, weight: .semibold)) // Title3 스타일
+                                .font(.system(size: 18, weight: .semibold)) // 서브헤드 스타일
                                 .foregroundColor(CLColor.SwiftUI.textPrimary)
                                 .padding(.vertical, 8)
                         }
@@ -454,7 +457,7 @@ struct FoodTypeButton: View {
         Button(action: onTap) {
             VStack {
                 Text(type.displayName)
-                    .font(.system(size: 15)) // Subheadline 스타일
+                    .font(.system(size: 14)) // 본문 작게 스타일
                     .padding(.horizontal, 8)
                     .padding(.vertical, 10)
                     .multilineTextAlignment(.center)
@@ -466,7 +469,7 @@ struct FoodTypeButton: View {
             .cornerRadius(8) // 중간 카드 코너 반경 8pt
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(isSelected ? CLColor.SwiftUI.primaryColor : Color.clear, lineWidth: 2)
+                    .stroke(isSelected ? CLColor.SwiftUI.primaryColor : Color.clear, lineWidth: 1)
             )
         }
     }
@@ -475,13 +478,13 @@ struct FoodTypeButton: View {
 // 디자인 시스템의 버튼들 구현
 struct PrimaryButton: View {
     var text: String
-    var height: CGFloat = 50
+    var height: CGFloat = 48
     var action: () -> Void
     
     var body: some View {
         Button(action: action) {
             Text(text)
-                .font(.system(size: 17, weight: .semibold)) // 버튼 텍스트 스타일
+                .font(.system(size: 16, weight: .semibold)) // 버튼 텍스트 스타일
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: height)
@@ -493,17 +496,17 @@ struct PrimaryButton: View {
 
 struct SecondaryButton: View {
     var text: String
-    var height: CGFloat = 50
+    var height: CGFloat = 48
     var action: () -> Void
     
     var body: some View {
         Button(action: action) {
             Text(text)
-                .font(.system(size: 17, weight: .semibold))
+                .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(CLColor.SwiftUI.primaryColor)
                 .frame(maxWidth: .infinity)
                 .frame(height: height)
-                .background(Color.white)
+                .background(CLColor.SwiftUI.backgroundBase)
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(CLColor.SwiftUI.primaryColor, lineWidth: 1)
@@ -520,7 +523,7 @@ struct TextButton: View {
     var body: some View {
         Button(action: action) {
             Text(text)
-                .font(.system(size: 17, weight: .semibold))
+                .font(.system(size: 16, weight: .medium))
                 .foregroundColor(CLColor.SwiftUI.primaryColor)
                 .padding(.vertical, 8)
                 .padding(.horizontal, 4)
@@ -529,8 +532,6 @@ struct TextButton: View {
 }
 
 // MARK: - 미리보기
-struct FoodTruckListView_Previews: PreviewProvider {
-    static var previews: some View {
-        FoodTruckListView(userState: UserState())
-    }
+#Preview {
+    FoodTruckListView()
 }
