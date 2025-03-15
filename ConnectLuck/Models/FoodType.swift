@@ -58,4 +58,6 @@ enum FoodType: String, Codable, CaseIterable {
     static var allCasesString: [String] {
         return Self.allCases.map { $0.rawValue }
     }
+
 }
+
