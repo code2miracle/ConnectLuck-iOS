@@ -14,8 +14,9 @@ struct ConnectLuckApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                ContentView(userState: userState)
+                ContentView()
             }
+            .environment(userState)
             .task {
                 // 앱 시작 시 서버 연결 테스트
                 let isConnected = await UserService.shared.testServerConnection()
@@ -23,7 +24,7 @@ struct ConnectLuckApp: App {
                 
                 // 저장된 토큰이 있다면 사용자 정보 로드
                 if TokenManager.shared.isLoggedIn {
-                    await userState.fetchUserInfo()
+                    userState.loadUserInfo()
                 }
             }
         }
