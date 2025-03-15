@@ -20,11 +20,11 @@ class NetworkManager {
     private let baseURL = EndPoint.baseURL
     private let monitor = NWPathMonitor()
     private var isConnected = true
-
+    
     private init() {
         startNetworkMonitoring()
     }
-
+    
     // MARK: - 네트워크 상태 감지
     private func startNetworkMonitoring() {
         monitor.pathUpdateHandler = { path in
@@ -35,12 +35,12 @@ class NetworkManager {
         }
         monitor.start(queue: DispatchQueue.global(qos: .background))
     }
-
+    
     /// 현재 인터넷 연결 상태 확인
     func isInternetAvailable() -> Bool {
         return isConnected
     }
-
+    
     // MARK: - API 요청
     func request<T: Decodable>(
         endpoint: String,
@@ -51,18 +51,18 @@ class NetworkManager {
         // 네트워크 연결 확인
         guard isConnected else { throw URLError(.notConnectedToInternet) }
         guard let url = URL(string: baseURL + endpoint) else { throw URLError(.badURL) }
-
+        
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
+        
         // 헤더 설정 (주의: Auth API는 헤더가 비어있어야 함)
         if let headers = headers {
             for (key, value) in headers {
                 request.setValue(value, forHTTPHeaderField: key)
             }
         }
-
+        
         // 요청 바디 설정
         if let body = body {
             let jsonData = try JSONSerialization.data(withJSONObject: body)
@@ -73,12 +73,12 @@ class NetworkManager {
                 print("Request Body: \(bodyString)")
             }
         }
-
+        
         // 디버깅용 - 요청 정보 출력
         print("Request URL: \(url)")
         print("Request Method: \(method.rawValue)")
         print("Request Headers: \(request.allHTTPHeaderFields ?? [:])")
-
+        
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
             
@@ -86,33 +86,28 @@ class NetworkManager {
             if let responseString = String(data: data, encoding: .utf8) {
                 print("Response: \(responseString)")
             }
-
+            
             guard let httpResponse = response as? HTTPURLResponse else {
                 throw URLError(.badServerResponse)
             }
             
-            // HTTP 상태 코드 확인
             print("HTTP 상태 코드: \(httpResponse.statusCode)")
             
             switch httpResponse.statusCode {
             case 200..<300:
-                // 성공 응답
-                return try JSONDecoder().decode(T.self, from: data)
-            case 400:
-                // 잘못된 요청
-                if let errorData = try? JSONDecoder().decode(ErrorResponse.self, from: data) {
-                    print("에러 상세: \(errorData)")
-                    throw APIError.badRequest(message: errorData.message)
+                do {
+                    return try JSONDecoder().decode(T.self, from: data)
+                } catch {
+                    print("JSON 디코딩 오류: \(error.localizedDescription)")
+                    throw APIError.badRequest(message: "서버 응답을 처리할 수 없습니다.")
                 }
-                throw APIError.badRequest(message: "잘못된 요청입니다")
+            case 400:
+                throw APIError.badRequest(message: "잘못된 요청입니다.")
             case 401:
-                // 인증 오류
                 throw APIError.unauthorized
             case 404:
-                // 리소스 없음
                 throw APIError.notFound
             default:
-                // 기타 HTTP 오류
                 throw APIError.serverError(statusCode: httpResponse.statusCode)
             }
         } catch {
